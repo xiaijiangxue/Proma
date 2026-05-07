@@ -7,7 +7,7 @@
 
 import * as React from 'react'
 import { useAtom } from 'jotai'
-import { Camera, ImagePlus, Volume2 } from 'lucide-react'
+import { Camera, ImagePlus, Volume2, FolderOpen, X } from 'lucide-react'
 import Picker from '@emoji-mart/react'
 import data from '@emoji-mart/data'
 import {
@@ -65,12 +65,13 @@ export function GeneralSettings(): React.ReactElement {
   const [nameInput, setNameInput] = React.useState(userProfile.userName)
   const [showEmojiPicker, setShowEmojiPicker] = React.useState(false)
   const [archiveAfterDays, setArchiveAfterDays] = React.useState<number>(7)
+  const [customSdkCliPath, setCustomSdkCliPath] = React.useState<string>('')
   const fileInputRef = React.useRef<HTMLInputElement>(null)
 
-  // 加载归档天数设置
   React.useEffect(() => {
     window.electronAPI.getSettings().then((settings) => {
       setArchiveAfterDays(settings.archiveAfterDays ?? 7)
+      setCustomSdkCliPath(settings.customSdkCliPath ?? '')
     }).catch(console.error)
   }, [])
 
@@ -319,6 +320,70 @@ export function GeneralSettings(): React.ReactElement {
               updateStickyUserMessageEnabled(checked)
             }}
           />
+        </SettingsCard>
+      </SettingsSection>
+
+      {/* Agent SDK 设置 */}
+      <SettingsSection
+        title="Agent SDK"
+        description="配置 Claude Agent SDK 的 CLI 路径，留空则使用内置 SDK"
+      >
+        <SettingsCard>
+          <SettingsRow
+            label="自定义 CLI 路径"
+            description="指定本地 claude CLI 可执行文件路径（类似 desktop-cc-gui 的 bin_path），留空使用内置 SDK"
+          >
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={customSdkCliPath}
+                onChange={(e) => setCustomSdkCliPath(e.target.value)}
+                onBlur={async () => {
+                  try {
+                    await window.electronAPI.updateSettings({ customSdkCliPath: customSdkCliPath.trim() || undefined })
+                  } catch (error) {
+                    console.error('[通用设置] 更新自定义 SDK CLI 路径失败:', error)
+                  }
+                }}
+                placeholder="/usr/local/bin/claude"
+                className="w-[260px] h-8 text-[13px] bg-transparent border border-border rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-ring"
+              />
+              {customSdkCliPath && (
+                <button
+                  onClick={async () => {
+                    setCustomSdkCliPath('')
+                    try {
+                      await window.electronAPI.updateSettings({ customSdkCliPath: undefined })
+                    } catch (error) {
+                      console.error('[通用设置] 清除自定义 SDK CLI 路径失败:', error)
+                    }
+                  }}
+                  className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                  title="清除"
+                >
+                  <X size={14} />
+                </button>
+              )}
+              <button
+                onClick={async () => {
+                  const result = await window.electronAPI.openFolderDialog()
+                  if (result) {
+                    const path = result.path
+                    setCustomSdkCliPath(path)
+                    try {
+                      await window.electronAPI.updateSettings({ customSdkCliPath: path })
+                    } catch (error) {
+                      console.error('[通用设置] 更新自定义 SDK CLI 路径失败:', error)
+                    }
+                  }
+                }}
+                className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                title="浏览"
+              >
+                <FolderOpen size={16} />
+              </button>
+            </div>
+          </SettingsRow>
         </SettingsCard>
       </SettingsSection>
     </div>

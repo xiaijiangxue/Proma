@@ -193,6 +193,8 @@ export interface AppSettings {
   appIconVariant?: string
   /** 语音输入设置（Access Token 以加密态存储，由专用服务解密后返回渲染进程） */
   voiceDictation?: VoiceDictationPersistedSettings
+  /** 自定义 Claude Agent SDK CLI 路径（为空则使用内置 SDK binary） */
+  customSdkCliPath?: string
 }
 
 /** 持久化的标签页状态 */

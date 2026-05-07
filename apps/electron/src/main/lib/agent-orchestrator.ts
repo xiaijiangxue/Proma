@@ -217,6 +217,13 @@ function timerWithAbort(ms: number, signal: AbortSignal): Promise<void> {
  * 兜底不伤人）。
  */
 function resolveSDKCliPath(): string {
+  const settings = getSettings()
+  if (settings.customSdkCliPath?.trim()) {
+    const customPath = settings.customSdkCliPath.trim()
+    console.log(`[Agent 编排] 使用自定义 SDK CLI 路径: ${customPath}`)
+    return customPath
+  }
+
   const subpkg = `claude-agent-sdk-${process.platform}-${process.arch}`
   const binaryName = process.platform === 'win32' ? 'claude.exe' : 'claude'
   let binaryPath: string | null = null
