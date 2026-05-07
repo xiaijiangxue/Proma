@@ -77,7 +77,6 @@ mac:
   # @anthropic-ai/claude-agent-sdk-darwin-{arch} native binary 对齐。
   target:
     - dmg
-    - zip
 
 # DMG 配置
 dmg:

@@ -47,7 +47,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Proma-macOS-ARM64
-          path: |
-            apps/electron/out/*.dmg
-            apps/electron/out/*.zip
+          path: apps/electron/out/*.dmg
           retention-days: 30
