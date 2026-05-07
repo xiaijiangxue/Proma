@@ -17,6 +17,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号（如 0.1.0），留空则使用 package.json 中的版本'
+        required: false
+        type: string
 
 permissions:
   contents: write
