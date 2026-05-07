@@ -12,11 +12,12 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   build:
     name: Build macOS ARM64
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
       - name: 检出代码
@@ -28,12 +29,12 @@ jobs:
           bun-version: latest
 
       - name: 安装 Node.js
-        uses: oven-sh/setup-node@v4
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: 安装依赖
-        run: bun install --frozen-lockfile
+        run: bun install
 
       - name: 构建 Electron 应用
         run: bun run electron:build
@@ -46,5 +47,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Proma-macOS-ARM64
-          path: apps/electron/out/*.dmg
+          path: |
+            apps/electron/out/*.dmg
+            apps/electron/out/*.zip
           retention-days: 30
